@@ -2,20 +2,21 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>NEURAL_LINK_TRANSLATOR_V3</title>
+<title>GOLDEN_VOX_TRANSLATOR_PRO</title>
 
 <style>
 :root {
-  --neon: #00ff41; /* Цвет матрицы (можно сменить на #FFD700 для золотого) */
+  --gold: #FFD700;
+  --dark-gold: #B8860B;
   --bg: #050505;
-  --glow: rgba(0, 255, 65, 0.5);
+  --glow: rgba(255, 215, 0, 0.3);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
   background: var(--bg);
-  color: var(--neon);
+  color: var(--gold);
   font-family: 'Courier New', Courier, monospace;
   height: 100vh;
   display: flex;
@@ -26,38 +27,23 @@ body {
   position: relative;
 }
 
-/* Эффект сканирующих линий старого монитора */
+/* Сетка на фоне */
 body::before {
   content: "";
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), 
-              linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-  background-size: 100% 4px, 3px 100%;
-  pointer-events: none;
-  z-index: 10;
-}
-
-/* Бегущая полоса сканера */
-body::after {
-  content: "";
-  position: absolute;
-  top: -100px; left: 0; width: 100%; height: 100px;
-  background: rgba(0, 255, 65, 0.05);
-  box-shadow: 0 0 40px rgba(0, 255, 65, 0.1);
-  animation: scan 4s linear infinite;
-  z-index: 11;
-}
-
-@keyframes scan {
-  0% { top: -100px; }
-  100% { top: 100%; }
+  background-image: 
+    linear-gradient(var(--glow) 1px, transparent 1px),
+    linear-gradient(90deg, var(--glow) 1px, transparent 1px);
+  background-size: 50px 50px;
+  opacity: 0.1;
+  z-index: 1;
 }
 
 #browser-error {
   display: none;
-  background: #200;
-  border: 2px solid #f00;
+  background: rgba(255, 0, 0, 0.1);
+  border: 1px solid #f00;
   color: #f44;
   padding: 15px;
   position: fixed;
@@ -67,126 +53,130 @@ body::after {
 }
 
 h1 {
-  font-size: 3rem;
-  letter-spacing: 5px;
+  font-size: 2.5rem;
+  letter-spacing: 8px;
   text-transform: uppercase;
   margin-bottom: 30px;
-  text-shadow: 0 0 10px var(--neon), 0 0 20px var(--neon);
-  animation: blink 2s infinite;
+  text-shadow: 0 0 15px var(--gold);
+  z-index: 2;
 }
 
-@keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
-}
-
+/* Золотая кнопка */
 .main-btn {
   position: relative;
-  font-size: 1.5rem;
-  padding: 20px 60px;
+  font-size: 1.2rem;
+  padding: 18px 50px;
   background: transparent;
-  color: var(--neon);
-  border: 2px solid var(--neon);
+  color: var(--gold);
+  border: 2px solid var(--gold);
   cursor: pointer;
-  outline: none;
   text-transform: uppercase;
-  transition: 0.3s;
+  transition: all 0.4s;
   z-index: 20;
-  box-shadow: 0 0 15px var(--glow), inset 0 0 10px var(--glow);
+  box-shadow: 0 0 10px var(--glow), inset 0 0 5px var(--glow);
+  overflow: hidden;
 }
 
 .main-btn:hover {
-  background: var(--neon);
+  background: var(--gold);
   color: #000;
-  box-shadow: 0 0 40px var(--neon);
+  box-shadow: 0 0 50px var(--gold);
 }
 
-.main-btn:disabled {
-  border-color: #333;
-  color: #333;
-  box-shadow: none;
+.main-btn::after {
+  content: "";
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+  transition: 0.5s;
 }
+
+.main-btn:hover::after { left: 100%; }
 
 .container {
   width: 90%;
-  max-width: 900px;
-  margin-top: 50px;
+  max-width: 850px;
+  margin-top: 40px;
   display: grid;
-  gap: 20px;
+  gap: 25px;
   z-index: 20;
 }
 
 .box {
-  background: rgba(0, 20, 0, 0.4);
-  backdrop-filter: blur(5px);
-  border: 1px solid var(--neon);
-  padding: 25px;
-  border-radius: 4px;
+  background: rgba(15, 15, 15, 0.85);
+  border-left: 5px solid var(--gold);
+  border-right: 1px solid var(--dark-gold);
+  border-top: 1px solid var(--dark-gold);
+  border-bottom: 1px solid var(--dark-gold);
+  padding: 30px;
   position: relative;
-  min-height: 100px;
-  box-shadow: 0 0 15px rgba(0, 255, 65, 0.1);
+  min-height: 120px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-.box::before {
-  content: "[DATA_STREAM]";
+/* Декоративный уголок */
+.box::after {
+  content: "";
   position: absolute;
-  top: -10px; left: 15px;
-  background: var(--bg);
-  padding: 0 10px;
-  font-size: 12px;
-  color: var(--neon);
-}
-
-#orig, #tran {
-  font-size: 1.4rem;
-  line-height: 1.6;
+  bottom: 0; right: 0;
+  border-style: solid;
+  border-width: 0 0 15px 15px;
+  border-color: transparent transparent var(--gold) transparent;
 }
 
 .label {
-  color: #888;
-  font-size: 0.8rem;
-  margin-bottom: 10px;
-  display: block;
-}
-
-/* Пульсирующий фон */
-.bg-circles {
   position: absolute;
-  width: 400px;
-  height: 400px;
-  border: 1px solid var(--glow);
-  border-radius: 50%;
-  animation: pulse 4s infinite;
-  z-index: 1;
+  top: -10px;
+  left: 20px;
+  background: var(--bg);
+  padding: 0 10px;
+  font-size: 0.7rem;
+  letter-spacing: 2px;
+  color: var(--dark-gold);
 }
 
-@keyframes pulse {
-  0% { transform: scale(0.5); opacity: 1; }
-  100% { transform: scale(1.5); opacity: 0; }
+#orig, #tran {
+  font-size: 1.5rem;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(255,255,255,0.2);
+}
+
+/* Золотые частицы */
+.particle {
+  position: absolute;
+  background: var(--gold);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  animation: fly linear infinite;
+}
+
+@keyframes fly {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(-100vh); opacity: 0; }
 }
 </style>
 </head>
 <body>
 
 <div id="browser-error">
-  SYSTEM_FAILURE: VOX_RECOGNITION_NOT_DETECTED <br>
-  REQUIRED: CHROME_KERNEL_V8
+  [CRITICAL]: WEB_SPEECH_API_OFFLINE // USE CHROME OR EDGE
 </div>
 
-<div class="bg-circles"></div>
-<h1>NEURAL LINK</h1>
+<h1>GOLDEN VOX</h1>
 
-<button id="btn" class="main-btn">Activate Link</button>
+<button id="btn" class="main-btn">Initialize Link</button>
 
 <div class="container">
   <div class="box">
-    <span class="label">INPUT_SIGNAL (RU)</span>
-    <div id="orig">...waiting_for_voice_input...</div>
+    <span class="label">INPUT::RUSSIAN_STREAM</span>
+    <div id="orig">AWAITING_VOICE_SIGNAL...</div>
   </div>
 
-  <div class="box" style="border-color: #00d4ff; box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);">
-    <span class="label" style="color: #00d4ff;">OUTPUT_SIGNAL (EN)</span>
-    <div id="tran" style="color: #00d4ff; text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);">...awaiting_translation...</div>
+  <div class="box">
+    <span class="label">OUTPUT::ENGLISH_DECODED</span>
+    <div id="tran" style="color: var(--gold);">SYSTEM_READY_FOR_TRANSLATION...</div>
   </div>
 </div>
 
@@ -202,7 +192,6 @@ let active = false;
 if(!SpeechRecognition) {
   errBox.style.display = "block";
   btn.disabled = true;
-  btn.innerText = "LINK_FAILED";
 }
 
 let rec;
@@ -210,21 +199,19 @@ if(SpeechRecognition) {
   rec = new SpeechRecognition();
   rec.lang = "ru-RU";
   rec.continuous = true;
-  rec.interimResults = false;
 
   rec.onend = () => { if(active) rec.start(); };
 
   rec.onresult = async (e) => {
     if (window.speechSynthesis.speaking) return;
     const text = e.results[e.results.length - 1][0].transcript;
-    orig.innerText = text.toLowerCase();
+    orig.innerText = text.toUpperCase();
 
     const translated = await translate(text);
-    tran.innerText = translated.toLowerCase();
+    tran.innerText = translated.toUpperCase();
 
     const utterance = new SpeechSynthesisUtterance(translated);
     utterance.lang = "en-US";
-    utterance.rate = 1.0;
     window.speechSynthesis.speak(utterance);
   };
 }
@@ -234,15 +221,32 @@ async function translate(text) {
     const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=en&dt=t&q=${encodeURIComponent(text)}`);
     const data = await res.json();
     return data[0][0][0];
-  } catch(e) { return "SERVICE_UNAVAILABLE"; }
+  } catch(e) { return "TRANS_ERROR"; }
 }
 
 btn.onclick = () => {
   active = true;
   rec.start();
-  btn.innerText = "LINK_ACTIVE";
-  btn.style.boxShadow = "0 0 50px var(--neon)";
+  btn.innerText = "LINK ESTABLISHED";
+  btn.style.boxShadow = "0 0 40px var(--gold)";
 };
+
+// Генератор золотой пыли
+function createDust() {
+  for(let i=0; i<40; i++) {
+    let p = document.createElement('div');
+    p.className = 'particle';
+    let size = Math.random() * 3 + 'px';
+    p.style.width = size;
+    p.style.height = size;
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = Math.random() * 100 + 'vh';
+    p.style.opacity = Math.random();
+    p.style.animationDuration = Math.random() * 5 + 5 + 's';
+    document.body.appendChild(p);
+  }
+}
+createDust();
 </script>
 
 </body>
