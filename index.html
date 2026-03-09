@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Stream Voice Translator PRO</title>
+
+<style>
+body{
+  background:#0b0b0b;
+  color:#FFD700;
+  font-family:'Courier New', Courier, monospace;
+  text-align:center;
+  padding:40px;
+  overflow-x: hidden;
+  position: relative;
+}
+
+h1{
+  font-size:50px;
+  display:inline-block;
+  color:#FFD700;
+  text-shadow: 0 0 5px #FFD700,0 0 10px #FFD700,0 0 20px #FFA500;
+  margin-bottom:40px;
+  animation: glow 2s infinite alternate;
+  position: relative;
+}
+
+h1::before{
+  content:"💻⛓️";
+  margin-right:10px;
+  display:inline-block;
+  animation: logoBlink 1s infinite alternate;
+}
+
+@keyframes glow{
+  0%{ text-shadow: 0 0 5px #FFD700,0 0 10px #FFD700,0 0 20px #FFA500; }
+  50%{ text-shadow: 0 0 15px #FFD700,0 0 25px #FFD700,0 0 40px #FFA500; }
+  100%{ text-shadow: 0 0 5px #FFD700,0 0 10px #FFD700,0 0 20px #FFA500; }
+}
+
+@keyframes logoBlink{
+  0%{ opacity:0.6; transform: rotate(-5deg); }
+  50%{ opacity:1; transform: rotate(5deg); }
+  100%{ opacity:0.6; transform: rotate(-5deg); }
+}
+
+button{
+  font-size:22px;
+  padding:15px 40px;
+  background:#222;
+  color:#FFD700;
+  border:2px solid #FFD700;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+  text-shadow: 0 0 3px #000;
+  box-shadow: 0 0 10px #FFD700, 0 0 20px #FFA500 inset;
+  transition: all 0.2s ease;
+  position: relative;
+  animation: buttonFlicker 2s infinite alternate;
+}
+
+button:active { transform: scale(0.95); }
+
+.box{
+  margin-top:25px;
+  padding:25px;
+  background:#111;
+  border-radius:12px;
+  font-size:22px;
+  text-align:left;
+  color:#FFD700;
+  text-shadow: 0 0 3px #FFD700;
+  box-shadow: 0 0 10px #FFD700 inset, 0 0 20px #FFA500 inset;
+  min-height: 50px;
+}
+
+.box b{ display:block; font-size:24px; margin-bottom:8px; }
+
+.particle{
+  position:absolute;
+  width:4px;
+  height:4px;
+  background:#FFD700;
+  border-radius:50%;
+  opacity:0.8;
+  pointer-events:none;
+  animation: floatUp linear infinite;
+}
+
+@keyframes floatUp{
+  0%{ transform: translateY(0) scale(1); opacity:0.8; }
+  100%{ transform: translateY(-800px) scale(0.5); opacity:0; }
+}
+</style>
+</head>
+<body>
+
+<h1>Stream Voice Translator</h1>
+
+<button id="btn">START SESSION</button>
+
+<div class="box">
+<b>Original:</b>
+<div id="orig">...waiting for voice...</div>
+</div>
+
+<div class="box">
+<b>Translation:</b>
+<div id="tran">...waiting for data...</div>
+</div>
+
+<script>
+const btn = document.getElementById("btn");
+const orig = document.getElementById("orig");
+const tran = document.getElementById("tran");
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let isSpeaking = false; 
+
+if(!SpeechRecognition) {
+    alert("Браузер не поддерживает распознавание речи. Используй Chrome.");
+}
+
+const rec = new SpeechRecognition();
+rec.lang = "ru-RU";
+rec.continuous = true;
+rec.interimResults = false; // чтобы не дергать API на каждом слове
+
+// ФУНКЦИЯ ПЕРЕВОДА (Google Translate Script Bridge)
+async function translateText(text) {
+    try {
+        // Используем свободный скрипт Google Translate (без ключа)
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=en&dt=t&q=${encodeURIComponent(text)}`;
+        const r = await fetch(url);
+        const j = await r.json();
+        return j[0][0][0];
+    } catch (e) {
+        console.error("Translation error:", e);
+        return "Error in translation service.";
+    }
+}
+
+// Запуск
+btn.onclick = () => {
+    try {
+        rec.start();
+        btn.innerText = "LISTENING...";
+        btn.style.borderColor = "#00FF00";
+    } catch(e) { console.log("Already started"); }
+};
+
+// АВТО-ВОСКРЕШЕНИЕ (чтобы не выключался сам)
+rec.onend = () => {
+    rec.start();
+};
+
+rec.onresult = async e => {
+    // Если сейчас говорит синтезатор, игнорируем, чтобы не зациклиться
+    if (window.speechSynthesis.speaking) return;
+
+    let text = e.results[e.results.length - 1][0].transcript;
+    if(!text.trim()) return;
+
+    orig.innerText = text;
+
+    // Перевод через Google
+    const translated = await translateText(text);
+    tran.innerText = translated;
+
+    // Озвучка
+    let speech = new SpeechSynthesisUtterance(translated);
+    speech.lang = "en-US";
+    speech.rate = 1.0;
+    
+    // Ставим флаг, что мы говорим, чтобы микрофон игнорировал звук
+    speech.onstart = () => { isSpeaking = true; };
+    speech.onend = () => { isSpeaking = false; };
+    
+    speechSynthesis.speak(speech);
+};
+
+// Частицы
+function createParticles(num){
+  for(let i=0;i<num;i++){
+    let p=document.createElement('div');
+    p.classList.add('particle');
+    p.style.left=Math.random()*window.innerWidth+'px';
+    p.style.top=Math.random()*window.innerHeight+'px';
+    p.style.animationDuration=(Math.random()*5+3)+'s';
+    document.body.appendChild(p);
+  }
+}
+createParticles(50);
+</script>
+
+</body>
+</html>
