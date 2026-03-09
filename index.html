@@ -5,15 +5,14 @@
 <title>GOLDEN_AI_INTERFACE_V4</title>
 
 <style>
+/* ИНТЕРФЕЙС ОСТАВЛЕН БЕЗ ИЗМЕНЕНИЙ */
 :root {
   --gold: #FFD700;
   --bright-gold: #FFF5B7;
   --dark-gold: #8B6914;
   --bg: #030303;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
-
 body {
   background: var(--bg);
   color: var(--gold);
@@ -26,8 +25,6 @@ body {
   overflow: hidden;
   position: relative;
 }
-
-/* Эффект курсора */
 #cursor {
   width: 200px; height: 200px;
   background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
@@ -36,8 +33,6 @@ body {
   z-index: 0;
   transform: translate(-50%, -50%);
 }
-
-/* Золотая сетка с перспективой */
 .grid {
   position: absolute;
   width: 200%; height: 200%;
@@ -50,12 +45,10 @@ body {
   transform: perspective(500px) rotateX(60deg);
   animation: moveGrid 20s linear infinite;
 }
-
 @keyframes moveGrid {
   from { background-position: 0 0; }
   to { background-position: 0 600px; }
 }
-
 h1 {
   font-size: 3.5rem;
   font-weight: 900;
@@ -67,8 +60,6 @@ h1 {
   filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
   z-index: 2;
 }
-
-/* Кнопка с орбитами */
 .btn-wrapper {
   position: relative;
   display: flex;
@@ -76,7 +67,6 @@ h1 {
   justify-content: center;
   z-index: 10;
 }
-
 .orbit {
   position: absolute;
   border: 1px solid var(--gold);
@@ -86,9 +76,7 @@ h1 {
 }
 .orbit-1 { width: 180px; height: 180px; border-style: dashed; }
 .orbit-2 { width: 220px; height: 220px; animation-duration: 8s; animation-direction: reverse; }
-
 @keyframes rotate { from {transform: rotate(0deg)} to {transform: rotate(360deg)} }
-
 .main-btn {
   width: 140px; height: 140px;
   border-radius: 50%;
@@ -100,21 +88,19 @@ h1 {
   letter-spacing: 2px;
   box-shadow: 0 0 20px var(--gold), inset 0 0 20px var(--gold);
   transition: 0.5s;
+  z-index: 11;
 }
-
 .main-btn:hover {
   transform: scale(1.1);
   background: var(--gold);
   color: #000;
 }
-
 .container {
   width: 90%; max-width: 1000px;
   display: flex; gap: 30px;
   margin-top: 60px;
   z-index: 2;
 }
-
 .box {
   flex: 1;
   background: rgba(255, 215, 0, 0.03);
@@ -125,23 +111,14 @@ h1 {
   position: relative;
   transition: 0.4s;
 }
-
 .box:hover { border-color: var(--gold); background: rgba(255, 215, 0, 0.07); }
-
 .box b {
   font-size: 0.7rem; color: var(--gold);
   letter-spacing: 3px; position: absolute; top: 15px; left: 30px;
   opacity: 0.7;
 }
-
-#orig, #tran {
-  font-size: 1.6rem; line-height: 1.4; color: #fff;
-}
-
-/* Декоративная волна снизу */
-.waves {
-  position: absolute; bottom: 20px; display: flex; gap: 5px;
-}
+#orig, #tran { font-size: 1.6rem; line-height: 1.4; color: #fff; }
+.waves { position: absolute; bottom: 20px; display: flex; gap: 5px; }
 .wave {
   width: 3px; height: 15px; background: var(--gold);
   animation: wave 1s ease-in-out infinite;
@@ -183,12 +160,12 @@ h1 {
 </div>
 
 <script>
+// --- ИСПРАВЛЕННАЯ ЛОГИКА ---
 const btn = document.getElementById("btn");
 const orig = document.getElementById("orig");
 const tran = document.getElementById("tran");
 const cursor = document.getElementById("cursor");
 
-// Следование курсора
 document.addEventListener('mousemove', (e) => {
   cursor.style.left = e.pageX + 'px';
   cursor.style.top = e.pageY + 'px';
@@ -196,20 +173,35 @@ document.addEventListener('mousemove', (e) => {
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let active = false;
+let rec;
 
-if(SpeechRecognition) {
-  const rec = new SpeechRecognition();
+if (SpeechRecognition) {
+  rec = new SpeechRecognition();
   rec.lang = "ru-RU";
   rec.continuous = true;
+  rec.interimResults = false;
 
-  rec.onend = () => { if(active) rec.start(); };
+  rec.onstart = () => {
+    btn.innerText = "Active";
+    btn.style.boxShadow = "0 0 60px var(--gold)";
+    document.querySelector('.orbit-1').style.animationDuration = '1s';
+  };
 
-  rec.onresult = async (e) => {
+  rec.onend = () => {
+    if (active) {
+      try { rec.start(); } catch(e) {}
+    }
+  };
+
+  rec.onresult = async (event) => {
     if (window.speechSynthesis.speaking) return;
-    const text = e.results[e.results.length - 1][0].transcript;
-    orig.innerText = text;
 
-    const translated = await translate(text);
+    const speechToText = event.results[event.results.length - 1][0].transcript;
+    if (!speechToText.trim()) return;
+
+    orig.innerText = speechToText;
+
+    const translated = await translate(speechToText);
     tran.innerText = translated;
 
     const utterance = new SpeechSynthesisUtterance(translated);
@@ -218,18 +210,28 @@ if(SpeechRecognition) {
   };
 
   btn.onclick = () => {
-    active = true;
-    rec.start();
-    btn.innerText = "Active";
-    btn.style.boxShadow = "0 0 60px var(--gold)";
-    document.querySelector('.orbit-1').style.animationDuration = '1s';
+    if (!active) {
+      active = true;
+      rec.start();
+    }
   };
+} else {
+  btn.innerText = "No Support";
+  btn.disabled = true;
 }
 
 async function translate(text) {
-  const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=en&dt=t&q=${encodeURIComponent(text)}`);
-  const data = await res.json();
-  return data[0][0][0];
+  try {
+    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=en&dt=t&q=${encodeURIComponent(text)}`);
+    const data = await res.json();
+    if (data && data[0] && data[0][0]) {
+        return data[0][0][0];
+    }
+    return "Error: Data format";
+  } catch(e) { 
+    console.error(e);
+    return "Translation Timeout..."; 
+  }
 }
 </script>
 
