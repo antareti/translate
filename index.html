@@ -2,174 +2,120 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>GOLDEN_AI_INTERFACE_V4</title>
+<title>GOLDEN_AI_LITE</title>
 
 <style>
-/* ИНТЕРФЕЙС ОСТАВЛЕН БЕЗ ИЗМЕНЕНИЙ */
 :root {
   --gold: #FFD700;
-  --bright-gold: #FFF5B7;
-  --dark-gold: #8B6914;
-  --bg: #030303;
+  --dark-gold: #413200;
+  --bg: #050505;
 }
-* { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
 body {
   background: var(--bg);
   color: var(--gold);
-  font-family: 'Segoe UI', 'Courier New', monospace;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
   height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  position: relative;
 }
-#cursor {
-  width: 200px; height: 200px;
-  background: radial-gradient(circle, rgba(255, 215, 0, 0.15) 0%, transparent 70%);
-  position: absolute;
-  pointer-events: none;
-  z-index: 0;
-  transform: translate(-50%, -50%);
-}
+
+/* Оптимизированный фон без сложных анимаций */
 .grid {
   position: absolute;
-  width: 200%; height: 200%;
-  top: -50%;
-  background-image: linear-gradient(var(--dark-gold) 1px, transparent 1px), 
-                    linear-gradient(90deg, var(--dark-gold) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(circle, black, transparent 80%);
-  opacity: 0.15;
-  transform: perspective(500px) rotateX(60deg);
-  animation: moveGrid 20s linear infinite;
+  width: 100%; height: 100%;
+  background-image: radial-gradient(circle at 50% 50%, #1a1a00 0%, #050505 80%);
+  z-index: 0;
 }
-@keyframes moveGrid {
-  from { background-position: 0 0; }
-  to { background-position: 0 600px; }
-}
+
 h1 {
-  font-size: 3.5rem;
-  font-weight: 900;
-  background: linear-gradient(to bottom, var(--bright-gold), var(--dark-gold));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  letter-spacing: 15px;
-  margin-bottom: 50px;
-  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+  font-size: 2.5rem;
+  letter-spacing: 10px;
+  margin-bottom: 30px;
+  text-shadow: 0 0 10px var(--gold);
   z-index: 2;
+  text-align: center;
 }
+
 .btn-wrapper {
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 10;
+  margin-bottom: 40px;
 }
-.orbit {
-  position: absolute;
-  border: 1px solid var(--gold);
-  border-radius: 50%;
-  opacity: 0.3;
-  animation: rotate 4s linear infinite;
-}
-.orbit-1 { width: 180px; height: 180px; border-style: dashed; }
-.orbit-2 { width: 220px; height: 220px; animation-duration: 8s; animation-direction: reverse; }
-@keyframes rotate { from {transform: rotate(0deg)} to {transform: rotate(360deg)} }
+
 .main-btn {
-  width: 140px; height: 140px;
+  width: 120px; height: 120px;
   border-radius: 50%;
-  background: rgba(10, 10, 10, 0.9);
+  background: #000;
   border: 2px solid var(--gold);
   color: var(--gold);
   font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 2px;
-  box-shadow: 0 0 20px var(--gold), inset 0 0 20px var(--gold);
-  transition: 0.5s;
-  z-index: 11;
+  cursor: pointer;
+  box-shadow: 0 0 15px var(--gold);
+  transition: transform 0.2s;
 }
-.main-btn:hover {
-  transform: scale(1.1);
-  background: var(--gold);
-  color: #000;
-}
+
+.main-btn:active { transform: scale(0.9); }
+
 .container {
-  width: 90%; max-width: 1000px;
-  display: flex; gap: 30px;
-  margin-top: 60px;
+  width: 90%; max-width: 800px;
+  display: flex; flex-direction: column; gap: 20px;
   z-index: 2;
 }
+
 .box {
-  flex: 1;
-  background: rgba(255, 215, 0, 0.03);
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  padding: 40px 30px;
-  border-radius: 20px;
+  background: rgba(20, 20, 20, 0.9);
+  border: 1px solid var(--dark-gold);
+  padding: 25px;
+  border-radius: 10px;
   position: relative;
-  transition: 0.4s;
 }
-.box:hover { border-color: var(--gold); background: rgba(255, 215, 0, 0.07); }
+
 .box b {
-  font-size: 0.7rem; color: var(--gold);
-  letter-spacing: 3px; position: absolute; top: 15px; left: 30px;
-  opacity: 0.7;
+  font-size: 0.6rem; color: var(--gold);
+  letter-spacing: 2px; display: block; margin-bottom: 10px;
+  opacity: 0.6;
 }
-#orig, #tran { font-size: 1.6rem; line-height: 1.4; color: #fff; }
-.waves { position: absolute; bottom: 20px; display: flex; gap: 5px; }
-.wave {
-  width: 3px; height: 15px; background: var(--gold);
-  animation: wave 1s ease-in-out infinite;
-}
-@keyframes wave { 
-  0%, 100% { height: 5px; opacity: 0.3; }
-  50% { height: 30px; opacity: 1; }
-}
+
+#orig, #tran { font-size: 1.3rem; color: #fff; min-height: 1.5em; }
+
+/* Легкая анимация только для активного состояния */
+.active-border { border-color: var(--gold) !important; box-shadow: 0 0 10px var(--gold); }
+
 </style>
 </head>
 <body>
 
-<div id="cursor"></div>
 <div class="grid"></div>
 
 <h1>GOLDEN_CORE</h1>
 
 <div class="btn-wrapper">
-  <div class="orbit orbit-1"></div>
-  <div class="orbit orbit-2"></div>
-  <button id="btn" class="main-btn">Init</button>
+  <button id="btn" class="main-btn">START</button>
 </div>
 
 <div class="container">
-  <div class="box">
+  <div class="box" id="inputBox">
     <b>[INPUT_SIGNAL]</b>
-    <div id="orig">Ready for RU signal...</div>
-    <div class="waves">
-      <div class="wave" style="animation-delay: 0.1s"></div>
-      <div class="wave" style="animation-delay: 0.3s"></div>
-      <div class="wave" style="animation-delay: 0.5s"></div>
-    </div>
+    <div id="orig">Ready...</div>
   </div>
 
-  <div class="box" style="border-top: 4px solid var(--gold);">
+  <div class="box" id="outputBox">
     <b>[AI_OUTPUT]</b>
-    <div id="tran" style="color: var(--bright-gold);">Awaiting decode...</div>
+    <div id="tran" style="color: var(--gold);">Waiting...</div>
   </div>
 </div>
 
 <script>
-// --- ИСПРАВЛЕННАЯ ЛОГИКА ---
 const btn = document.getElementById("btn");
 const orig = document.getElementById("orig");
 const tran = document.getElementById("tran");
-const cursor = document.getElementById("cursor");
-
-document.addEventListener('mousemove', (e) => {
-  cursor.style.left = e.pageX + 'px';
-  cursor.style.top = e.pageY + 'px';
-});
+const inputBox = document.getElementById("inputBox");
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let active = false;
@@ -179,19 +125,13 @@ if (SpeechRecognition) {
   rec = new SpeechRecognition();
   rec.lang = "ru-RU";
   rec.continuous = true;
-  rec.interimResults = false;
 
   rec.onstart = () => {
-    btn.innerText = "Active";
-    btn.style.boxShadow = "0 0 60px var(--gold)";
-    document.querySelector('.orbit-1').style.animationDuration = '1s';
+    btn.innerText = "LIVE";
+    inputBox.classList.add('active-border');
   };
 
-  rec.onend = () => {
-    if (active) {
-      try { rec.start(); } catch(e) {}
-    }
-  };
+  rec.onend = () => { if (active) rec.start(); };
 
   rec.onresult = async (event) => {
     if (window.speechSynthesis.speaking) return;
@@ -200,7 +140,6 @@ if (SpeechRecognition) {
     if (!speechToText.trim()) return;
 
     orig.innerText = speechToText;
-
     const translated = await translate(speechToText);
     tran.innerText = translated;
 
@@ -215,23 +154,14 @@ if (SpeechRecognition) {
       rec.start();
     }
   };
-} else {
-  btn.innerText = "No Support";
-  btn.disabled = true;
 }
 
 async function translate(text) {
   try {
     const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=en&dt=t&q=${encodeURIComponent(text)}`);
     const data = await res.json();
-    if (data && data[0] && data[0][0]) {
-        return data[0][0][0];
-    }
-    return "Error: Data format";
-  } catch(e) { 
-    console.error(e);
-    return "Translation Timeout..."; 
-  }
+    return data[0][0][0];
+  } catch(e) { return "Error..."; }
 }
 </script>
 
