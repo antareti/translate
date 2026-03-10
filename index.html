@@ -25,7 +25,6 @@ body {
   overflow: hidden;
 }
 
-/* Оптимизированный фон без сложных анимаций */
 .grid {
   position: absolute;
   width: 100%; height: 100%;
@@ -84,7 +83,6 @@ h1 {
 
 #orig, #tran { font-size: 1.3rem; color: #fff; min-height: 1.5em; }
 
-/* Легкая анимация только для активного состояния */
 .active-border { border-color: var(--gold) !important; box-shadow: 0 0 10px var(--gold); }
 
 </style>
@@ -101,7 +99,7 @@ h1 {
 
 <div class="container">
   <div class="box" id="inputBox">
-    <b>[INPUT_SIGNAL]</b>
+    <b>[INPUT_SIGNAL (RU/EN)]</b>
     <div id="orig">Ready...</div>
   </div>
 
@@ -123,7 +121,8 @@ let rec;
 
 if (SpeechRecognition) {
   rec = new SpeechRecognition();
-  rec.lang = "ru-RU";
+  // Устанавливаем поддержку обоих языков для распознавания
+  rec.lang = "ru-RU"; 
   rec.continuous = true;
 
   rec.onstart = () => {
@@ -140,11 +139,14 @@ if (SpeechRecognition) {
     if (!speechToText.trim()) return;
 
     orig.innerText = speechToText;
-    const translated = await translate(speechToText);
-    tran.innerText = translated;
+    
+    // Пытаемся определить язык и перевести
+    const result = await translateAuto(speechToText);
+    tran.innerText = result.text;
 
-    const utterance = new SpeechSynthesisUtterance(translated);
-    utterance.lang = "en-US";
+    const utterance = new SpeechSynthesisUtterance(result.text);
+    // Если перевели на русский — говорим по-русски, иначе по-английски
+    utterance.lang = result.targetLang === 'ru' ? "ru-RU" : "en-US";
     window.speechSynthesis.speak(utterance);
   };
 
@@ -156,12 +158,32 @@ if (SpeechRecognition) {
   };
 }
 
-async function translate(text) {
+async function translateAuto(text) {
   try {
-    const res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=en&dt=t&q=${encodeURIComponent(text)}`);
-    const data = await res.json();
-    return data[0][0][0];
-  } catch(e) { return "Error..."; }
+    // Сначала определяем, какой это язык, чтобы понять куда переводить
+    // Мы используем sl=auto, чтобы Google сам понял язык
+    // Но чтобы реализовать "туда-обратно", мы сначала переводим на английский.
+    // Если результат совпадает с оригиналом, значит оригинал уже был английский — тогда переводим на русский.
+    
+    let res = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${encodeURIComponent(text)}`);
+    let data = await res.json();
+    let detectedLang = data[2]; // Google возвращает определенный язык в этом индексе
+    
+    let targetLang = 'en';
+    let translatedText = data[0][0][0];
+
+    // Если определенный язык — английский, переводим на русский
+    if (detectedLang === 'en') {
+      targetLang = 'ru';
+      let res2 = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ru&dt=t&q=${encodeURIComponent(text)}`);
+      let data2 = await res2.json();
+      translatedText = data2[0][0][0];
+    }
+
+    return { text: translatedText, targetLang: targetLang };
+  } catch(e) { 
+    return { text: "Error...", targetLang: "en" }; 
+  }
 }
 </script>
 
